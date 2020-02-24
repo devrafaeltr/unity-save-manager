@@ -17,6 +17,7 @@ public class Inventory
   //Cool variables here
 }
 
+[System.Serializable]
 public class PlayerData
 {
   public Inventory playerInventory;
