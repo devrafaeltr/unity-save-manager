@@ -47,8 +47,10 @@ public class Manager_Save
         FileStream fileToCreate = File.Create(savePath);
         binaryFormatter.Serialize(fileToCreate, GetPlayerData);
         fileToCreate.Close();
-
+        
+        #if UNITY_EDITOR
         Debug.Log("Saved: " + PlayerDataToJson(GetPlayerData));
+        #endif
     }
 
     public static void DeleteSave(uint newVersion)
@@ -67,10 +69,13 @@ public class Manager_Save
             GetPlayerData = (PlayerData)binaryFormatter.Deserialize(fileToOpen);
             fileToOpen.Close();
         }
-
+        
+        #if UNITY_EDITOR
         Debug.Log("Loaded: " + PlayerDataToJson(GetPlayerData));
+        #endif
     }
-
+    
+    #if UNITY_EDITOR
     //Only for debug purposes
     private static string PlayerDataToJson(PlayerData playerData)
     {
@@ -83,4 +88,5 @@ public class Manager_Save
             return JsonUtility.ToJson(playerData);
         }
     }
+    #endif
 }
