@@ -2,7 +2,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
 
-
+[System.Serializable]
 public class PlayerData
 {
     //You can change uint type if you think that the player will call Save() more than 2,147,483,647 times
