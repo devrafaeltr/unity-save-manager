@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerData
 {
-    //You can change uint type if you think that the player will call Save() more than 2,147,483,647 times
+    //You can change uint type if you think that the player will call Save() more than 2,147,483,647 times without deleting the save
     public uint saveVersion;
     
     //Another cool variables here
