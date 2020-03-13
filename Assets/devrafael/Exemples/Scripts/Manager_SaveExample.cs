@@ -14,6 +14,6 @@ public class Manager_SaveExample : MonoBehaviour
 
     public void DeleteSave()
     {
-        
+        Manager_Save.DeleteSave();
     }
 }

@@ -53,7 +53,7 @@ public class Manager_Save
         #endif
     }
 
-    public static void DeleteSave(uint newVersion)
+    public static void DeleteSave()
     {
         //This resets the saveVersion
         GetPlayerData = new PlayerData();
