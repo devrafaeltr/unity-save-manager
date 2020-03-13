@@ -5,26 +5,33 @@ using UnityEngine;
 public class Manager_Save
 {
     #region Save names
-    public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
-    public static readonly (string name, string format) myBool_SaveInfo = ("myPlayerData", ".dat");
+    //Template
+    //public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
+
     public static readonly (string name, string format) myInt_SaveInfo = ("myPlayerData", ".dat");
     public static readonly (string name, string format) myString_SaveInfo = ("myPlayerData", ".dat");
-
-    public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
+    public static readonly (string name, string format) myChar_SaveInfo = ("myPlayerData", ".dat");
+    public static readonly (string name, string format) myBool_SaveInfo = ("myPlayerData", ".dat");
+    public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
     #endregion    
 
-    public static T LoadData<T>((string name, string format) saveData, System.Action resultCallback = null) where T : new()
+    public static T LoadData<T>((string name, string format) saveData, System.Action resultCallback = null)
     {
-        T dataToLoad = new T();
+        T dataToLoad = default(T);
 
         if (File.Exists(GetPath(saveData)))
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             FileStream fileToOpen = File.Open(GetPath(saveData), FileMode.Open);
-            dataToLoad = (T)binaryFormatter.Deserialize(fileToOpen);
+
+            string encryptedJsonData = (string)binaryFormatter.Deserialize(fileToOpen);
+            string decyptedJsonData = SimpleEncryption.Decrypt(encryptedJsonData);
+
+            dataToLoad = FromJson<T>(decyptedJsonData);
             fileToOpen.Close();
+
 #if UNITY_EDITOR
-            Debug.Log("Loaded: " + PlayerDataToJson(dataToLoad));
+            Debug.Log($"Loaded JSON encrypted as: {encryptedJsonData}\nDecrypted to {typeof(T)}: {decyptedJsonData}");
 #endif
         }
 #if UNITY_EDITOR
@@ -46,17 +53,23 @@ public class Manager_Save
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             FileStream fileToCreate = File.Open(GetPath(saveData), FileMode.OpenOrCreate);
-            binaryFormatter.Serialize(fileToCreate, data);
+            //binaryFormatter.Serialize(fileToCreate, data);
+
+            string decyptedJsonData = DataToJson(data);
+            string encryptedJsonData = SimpleEncryption.Encrypt(decyptedJsonData);
+
+
+            binaryFormatter.Serialize(fileToCreate, encryptedJsonData);
             fileToCreate.Close();
 
 #if UNITY_EDITOR
-            Debug.Log("Saved: " + PlayerDataToJson(data));
+            Debug.Log($"Saved {typeof(T)} as JSON: {decyptedJsonData}\nEncrypted to: {encryptedJsonData}");
 #endif
         }
 #if UNITY_EDITOR
         else
         {
-            Debug.Log($"data param is null. Nothing to save.");
+            Debug.LogError($"data param is null. Nothing to save.");
         }
 #endif
 
@@ -86,19 +99,33 @@ public class Manager_Save
         return $"{Application.persistentDataPath}{saveData.name}{saveData.format}";
     }
 
-
-    //Only for debug purposes
-#if UNITY_EDITOR
-    private static string PlayerDataToJson<T>(T data)
+    private static string DataToJson(object data)
     {
-        if (data == null)
-        {
-            return JsonUtility.ToJson(default(T));
-        }
-        else
+        if (data != null)
         {
             return JsonUtility.ToJson(data);
         }
-    }
+#if UNITY_EDITOR
+        else
+        {
+            Debug.LogError($"data param is nul. Nothing to convert. Returning an empty string.");
+            return "";
+        }
 #endif
+    }
+
+    private static T FromJson<T>(string jsonData)
+    {
+        if (!string.IsNullOrEmpty(jsonData))
+        {
+            return JsonUtility.FromJson<T>(jsonData);
+        }
+#if UNITY_EDITOR
+        else
+        {
+            Debug.LogError($"jsonData param is empty. Nothing to convert. Returning a default value for {typeof(T)}.");
+            return default;
+        }
+#endif
+    }
 }
