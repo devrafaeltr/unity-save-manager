@@ -4,26 +4,32 @@ using UnityEngine;
 
 public class Manager_Save
 {
+    private class PrimitiveType<T>
+    {
+        T primitive;
+
+        public PrimitiveType(T data)
+        {
+            primitive = data;
+        }
+    }
+
     #region Save names
     //Template
     //public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
-
-    public static readonly (string name, string format) myInt_SaveInfo = ("myPlayerData", ".dat");
-    public static readonly (string name, string format) myString_SaveInfo = ("myPlayerData", ".dat");
-    public static readonly (string name, string format) myChar_SaveInfo = ("myPlayerData", ".dat");
-    public static readonly (string name, string format) myBool_SaveInfo = ("myPlayerData", ".dat");
     public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
     #endregion    
 
-    public static T LoadData<T>((string name, string format) saveData, System.Action<bool> resultCallback = null)
+    public static T LoadData<T>((string name, string format) saveInfo, System.Action<bool> resultCallback = null) where T : new()
     {
-        T dataToLoad = default(T);
+        T dataToLoad = new T();
         bool success = false;
+        string path = GetPath(saveInfo);
 
-        if (File.Exists(GetPath(saveData)))
+        if (File.Exists(path))
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            FileStream fileToOpen = File.Open(GetPath(saveData), FileMode.Open);
+            FileStream fileToOpen = File.Open(path, FileMode.Open);
 
             string encryptedJsonData = (string)binaryFormatter.Deserialize(fileToOpen);
             string decyptedJsonData = SimpleEncryption.Decrypt(encryptedJsonData);
@@ -32,9 +38,10 @@ public class Manager_Save
             fileToOpen.Close();
 
             success = true;
+            Debug.Log($"{encryptedJsonData}\n{decyptedJsonData}");
 
 #if UNITY_EDITOR
-            Debug.Log($"Loaded JSON encrypted as: {encryptedJsonData}\nDecrypted to {typeof(T)}: {decyptedJsonData}");
+            Debug.Log($"Loaded JSON at {path} \nEncrypted as: {encryptedJsonData}\nDecrypted to {typeof(T)}: {decyptedJsonData}");
 #endif
         }
 #if UNITY_EDITOR
@@ -49,17 +56,17 @@ public class Manager_Save
         return dataToLoad;
     }
 
-    public static void SaveData<T>((string name, string format) saveData, T data, System.Action<bool> resultCallback = null)
+    public static void SaveData<T>((string name, string format) saveInfo, T data, System.Action<bool> resultCallback = null)
     {
         bool success = false;
+        string path = GetPath(saveInfo);
 
         if (data != null)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            FileStream fileToCreate = File.Open(GetPath(saveData), FileMode.OpenOrCreate);
-            //binaryFormatter.Serialize(fileToCreate, data);
+            FileStream fileToCreate = File.Open(path, FileMode.OpenOrCreate);
 
-            string decyptedJsonData = DataToJson(data);
+            string decyptedJsonData = DataToJson((T)data);
             string encryptedJsonData = SimpleEncryption.Encrypt(decyptedJsonData);
 
 
@@ -69,7 +76,7 @@ public class Manager_Save
             success = true;
 
 #if UNITY_EDITOR
-            Debug.Log($"Saved {typeof(T)} as JSON: {decyptedJsonData}\nEncrypted to: {encryptedJsonData}");
+            Debug.Log($"Saved {typeof(T)} at {path}\nas JSON: {decyptedJsonData}\nEncrypted to: {encryptedJsonData}");
 #endif
         }
 #if UNITY_EDITOR
@@ -82,14 +89,14 @@ public class Manager_Save
         resultCallback?.Invoke(success);
     }
 
-    public static void DeleteData((string name, string format) saveData, System.Action<bool> resultCallback = null)
+    public static void DeleteData((string name, string format) saveInfo, System.Action<bool> resultCallback = null)
     {
         bool success = false;
-        string tempPath = GetPath(saveData);
+        string tempPath = GetPath(saveInfo);
         if (File.Exists(tempPath))
         {
 #if UNITY_EDITOR
-            Debug.Log($"Deleted {saveData.name}{saveData.format} at {Application.persistentDataPath}");
+            Debug.Log($"Deleted {saveInfo.name}{saveInfo.format} at {Application.persistentDataPath}");
 #endif
             File.Delete(tempPath);
             success = true;
@@ -97,7 +104,7 @@ public class Manager_Save
 #if UNITY_EDITOR
         else
         {
-            Debug.Log($"No file named {saveData.name}{saveData.format} found at {Application.persistentDataPath}");
+            Debug.Log($"No file named {saveInfo.name}{saveInfo.format} found at {Application.persistentDataPath}");
         }
 #endif
 
@@ -106,6 +113,7 @@ public class Manager_Save
 
     private static string GetPath((string name, string format) saveData)
     {
+        UnityEngine.Debug.Log($"name: {saveData.name} |format: {saveData.format}");
         return $"{Application.persistentDataPath}{saveData.name}{saveData.format}";
     }
 
