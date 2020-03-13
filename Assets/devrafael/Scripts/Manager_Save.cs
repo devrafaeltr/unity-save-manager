@@ -1,21 +1,15 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
-using System.Collections;
-
-[System.Serializable]
-public class PlayerData
-{
-    public uint saveVersion = 0;
-    public int myCoolInt = 0;
-    public string myCoolString = "";
-    public bool myCoolBool = false;
-}
 
 public class Manager_Save
 {
     #region Save names
     public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
+    public static readonly (string name, string format) myBool_SaveInfo = ("myPlayerData", ".dat");
+    public static readonly (string name, string format) myInt_SaveInfo = ("myPlayerData", ".dat");
+    public static readonly (string name, string format) myString_SaveInfo = ("myPlayerData", ".dat");
+
     public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
     #endregion    
 
@@ -39,32 +33,34 @@ public class Manager_Save
             Debug.Log($"No file found. Returning new {typeof(T)}");
         }
 #endif
+
         resultCallback?.Invoke();
 
         return dataToLoad;
     }
 
-    public static void SaveData<T>((string name, string format) saveData, T data = default(T), System.Action resultCallback = null) where T : new()
+    public static void SaveData<T>((string name, string format) saveData, T data, System.Action resultCallback = null)
     {
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        FileStream fileToCreate = File.Open(GetPath(saveData), FileMode.OpenOrCreate);
 
-        if (data == null)
+        if (data != null)
         {
-            data = new T();
-            Debug.Log($"data param is null. Saving a new {typeof(T)}");
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            FileStream fileToCreate = File.Open(GetPath(saveData), FileMode.OpenOrCreate);
+            binaryFormatter.Serialize(fileToCreate, data);
+            fileToCreate.Close();
+
 #if UNITY_EDITOR
+            Debug.Log("Saved: " + PlayerDataToJson(data));
 #endif
         }
-
-        binaryFormatter.Serialize(fileToCreate, data);
-        fileToCreate.Close();
+#if UNITY_EDITOR
+        else
+        {
+            Debug.Log($"data param is null. Nothing to save.");
+        }
+#endif
 
         resultCallback?.Invoke();
-
-#if UNITY_EDITOR
-        Debug.Log("Saved: " + PlayerDataToJson(data));
-#endif
     }
 
     public static void DeleteData((string name, string format) saveData)
