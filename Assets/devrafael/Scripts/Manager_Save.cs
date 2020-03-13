@@ -15,9 +15,10 @@ public class Manager_Save
     public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
     #endregion    
 
-    public static T LoadData<T>((string name, string format) saveData, System.Action resultCallback = null)
+    public static T LoadData<T>((string name, string format) saveData, System.Action<bool> resultCallback = null)
     {
         T dataToLoad = default(T);
+        bool success = false;
 
         if (File.Exists(GetPath(saveData)))
         {
@@ -30,6 +31,8 @@ public class Manager_Save
             dataToLoad = FromJson<T>(decyptedJsonData);
             fileToOpen.Close();
 
+            success = true;
+
 #if UNITY_EDITOR
             Debug.Log($"Loaded JSON encrypted as: {encryptedJsonData}\nDecrypted to {typeof(T)}: {decyptedJsonData}");
 #endif
@@ -41,13 +44,14 @@ public class Manager_Save
         }
 #endif
 
-        resultCallback?.Invoke();
+        resultCallback?.Invoke(success);
 
         return dataToLoad;
     }
 
-    public static void SaveData<T>((string name, string format) saveData, T data, System.Action resultCallback = null)
+    public static void SaveData<T>((string name, string format) saveData, T data, System.Action<bool> resultCallback = null)
     {
+        bool success = false;
 
         if (data != null)
         {
@@ -62,6 +66,8 @@ public class Manager_Save
             binaryFormatter.Serialize(fileToCreate, encryptedJsonData);
             fileToCreate.Close();
 
+            success = true;
+
 #if UNITY_EDITOR
             Debug.Log($"Saved {typeof(T)} as JSON: {decyptedJsonData}\nEncrypted to: {encryptedJsonData}");
 #endif
@@ -73,11 +79,12 @@ public class Manager_Save
         }
 #endif
 
-        resultCallback?.Invoke();
+        resultCallback?.Invoke(success);
     }
 
-    public static void DeleteData((string name, string format) saveData)
+    public static void DeleteData((string name, string format) saveData, System.Action<bool> resultCallback = null)
     {
+        bool success = false;
         string tempPath = GetPath(saveData);
         if (File.Exists(tempPath))
         {
@@ -85,6 +92,7 @@ public class Manager_Save
             Debug.Log($"Deleted {saveData.name}{saveData.format} at {Application.persistentDataPath}");
 #endif
             File.Delete(tempPath);
+            success = true;
         }
 #if UNITY_EDITOR
         else
@@ -92,6 +100,8 @@ public class Manager_Save
             Debug.Log($"No file named {saveData.name}{saveData.format} found at {Application.persistentDataPath}");
         }
 #endif
+
+        resultCallback?.Invoke(success);
     }
 
     private static string GetPath((string name, string format) saveData)
