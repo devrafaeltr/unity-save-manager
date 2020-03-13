@@ -1,92 +1,108 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
+using System.Collections;
 
 [System.Serializable]
 public class PlayerData
 {
-    //You can change uint type if you think that the player will call Save() more than 2,147,483,647 times without deleting the save
-    public uint saveVersion;
-    
-    //Another cool variables here
+    public uint saveVersion = 0;
+    public int myCoolInt = 0;
+    public string myCoolString = "";
+    public bool myCoolBool = false;
 }
 
 public class Manager_Save
 {
-    private static string savePath = "";
-    private static bool isInitialized = false;
+    #region Save names
+    public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
+    public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
+    #endregion    
 
-    public static PlayerData GetPlayerData { get; private set; } = new PlayerData();
-
-    public static void Init()
+    public static T LoadData<T>((string name, string format) saveData, System.Action resultCallback = null) where T : new()
     {
-        if (isInitialized)
-        {
-            return;
-        }
+        T dataToLoad = new T();
 
-        //You can change to any name and format like: "/banana.fruit"
-        savePath = Application.persistentDataPath + "/save.dat";
-        
-        isInitialized = true;
-    }
-
-    public static void LoadData(System.Action resultCallback = null)
-    {
-        Init();
-        LocalLoad();
-    }
-
-    public static void SaveData(System.Action resultCallback = null)
-    {
-        //Uncomment Init() if will call SaveData() before LoadData() in the game timeline
-        //Init();
-        GetPlayerData.saveVersion++;
-
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        FileStream fileToCreate = File.Create(savePath);
-        binaryFormatter.Serialize(fileToCreate, GetPlayerData);
-        fileToCreate.Close();
-        
-        #if UNITY_EDITOR
-        Debug.Log("Saved: " + PlayerDataToJson(GetPlayerData));
-        #endif
-    }
-
-    public static void DeleteSave()
-    {
-        //This resets the saveVersion
-        GetPlayerData = new PlayerData();
-        SaveData();
-    }
-
-    private static void LocalLoad()
-    {
-        if (File.Exists(savePath))
+        if (File.Exists(GetPath(saveData)))
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
-            FileStream fileToOpen = File.Open(savePath, FileMode.Open);
-            GetPlayerData = (PlayerData)binaryFormatter.Deserialize(fileToOpen);
+            FileStream fileToOpen = File.Open(GetPath(saveData), FileMode.Open);
+            dataToLoad = (T)binaryFormatter.Deserialize(fileToOpen);
             fileToOpen.Close();
+#if UNITY_EDITOR
+            Debug.Log("Loaded: " + PlayerDataToJson(dataToLoad));
+#endif
         }
-        
-        #if UNITY_EDITOR
-        Debug.Log("Loaded: " + PlayerDataToJson(GetPlayerData));
-        #endif
-    }
-    
-    #if UNITY_EDITOR
-    //Only for debug purposes
-    private static string PlayerDataToJson(PlayerData playerData)
-    {
-        if (playerData == null)
+#if UNITY_EDITOR
+        else
         {
-            return JsonUtility.ToJson(new PlayerData());
+            Debug.Log($"No file found. Returning new {typeof(T)}");
+        }
+#endif
+        resultCallback?.Invoke();
+
+        return dataToLoad;
+    }
+
+    public static void SaveData<T>((string name, string format) saveData, T data = default(T), System.Action resultCallback = null) where T : new()
+    {
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        FileStream fileToCreate = File.Open(GetPath(saveData), FileMode.OpenOrCreate);
+
+        if (data == null)
+        {
+            data = new T();
+            Debug.Log($"data param is null. Saving a new {typeof(T)}");
+#if UNITY_EDITOR
+#endif
+        }
+
+        binaryFormatter.Serialize(fileToCreate, data);
+        fileToCreate.Close();
+
+        resultCallback?.Invoke();
+
+#if UNITY_EDITOR
+        Debug.Log("Saved: " + PlayerDataToJson(data));
+#endif
+    }
+
+    public static void DeleteData((string name, string format) saveData)
+    {
+        string tempPath = GetPath(saveData);
+        if (File.Exists(tempPath))
+        {
+#if UNITY_EDITOR
+            Debug.Log($"Deleted {saveData.name}{saveData.format} at {Application.persistentDataPath}");
+#endif
+            File.Delete(tempPath);
+        }
+#if UNITY_EDITOR
+        else
+        {
+            Debug.Log($"No file named {saveData.name}{saveData.format} found at {Application.persistentDataPath}");
+        }
+#endif
+    }
+
+    private static string GetPath((string name, string format) saveData)
+    {
+        return $"{Application.persistentDataPath}{saveData.name}{saveData.format}";
+    }
+
+
+    //Only for debug purposes
+#if UNITY_EDITOR
+    private static string PlayerDataToJson<T>(T data)
+    {
+        if (data == null)
+        {
+            return JsonUtility.ToJson(default(T));
         }
         else
         {
-            return JsonUtility.ToJson(playerData);
+            return JsonUtility.ToJson(data);
         }
     }
-    #endif
+#endif
 }
