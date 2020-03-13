@@ -1,17 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Manager_SaveExample : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void Load()
     {
-        
+        Manager_Save.SaveData();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Save()
+    {
+        Manager_Save.SaveData();
+    }
+
+    public void DeleteSave()
     {
         
     }

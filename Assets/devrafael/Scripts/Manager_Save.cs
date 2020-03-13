@@ -31,15 +31,15 @@ public class Manager_Save
         isInitialized = true;
     }
 
-    public static void LoadGame(System.Action resultCallback = null)
+    public static void LoadData(System.Action resultCallback = null)
     {
         Init();
         LocalLoad();
     }
 
-    public static void SaveGame(System.Action resultCallback = null)
+    public static void SaveData(System.Action resultCallback = null)
     {
-        //Uncomment Init() if will call SaveGame() before LoadGame() in the game timeline
+        //Uncomment Init() if will call SaveData() before LoadData() in the game timeline
         //Init();
         GetPlayerData.saveVersion++;
 
@@ -57,7 +57,7 @@ public class Manager_Save
     {
         //This resets the saveVersion
         GetPlayerData = new PlayerData();
-        SaveGame();
+        SaveData();
     }
 
     private static void LocalLoad()
