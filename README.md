@@ -4,11 +4,11 @@ Simple way to save and load local data from your game.
 ___
 ## Getting started
 ### How to install:
-1. Download and import to your project
+1. Download and import to your project.
 2. Done!
 
 ### How to use:
-1. Go to the Manager_Save under `#region` SaveInfos
+1. Go to the Manager_Save under `#region` SaveInfos.
 2. Create a `public static (string name, string format) variableName = ("savedFileName", "savedFileFormat");` 
 There is a template. You can use any name and any format.
 3. Now, anywhere, you can call ```Manager_Save.SaveData(variableName, yourData)``` and ```Manager_Save.LoadData<type>(variableName, yourData)```;
@@ -35,6 +35,8 @@ When calling ```Manager_Save.LoadData<type>()```, does not forget to pass your v
   //Somewhere trying to load data:
   Manager_Save.LoadData<SomeClass>(saveInfo, playerDataVariabel)
   ```
+  
+You need to create a `public static (string name, string format) variableName` in the `Manager_Save` for **EACH** different save file. For example, if you want to save PlayerData and GameConfigs separately.
 ___
 ## Know limitations
 Since Manager_Save uses JsonUtility it does not work for primitive type, yet. See more [here](https://docs.unity3d.com/ScriptReference/JsonUtility.ToJson.html).  
