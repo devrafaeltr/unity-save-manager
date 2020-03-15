@@ -4,17 +4,7 @@ using UnityEngine;
 
 public class Manager_Save
 {
-    private class PrimitiveType<T>
-    {
-        T primitive;
-
-        public PrimitiveType(T data)
-        {
-            primitive = data;
-        }
-    }
-
-    #region Save names
+    #region SaveInfos
     //Template
     //public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
     public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
