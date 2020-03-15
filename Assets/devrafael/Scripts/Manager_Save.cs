@@ -38,7 +38,6 @@ public class Manager_Save
             fileToOpen.Close();
 
             success = true;
-            Debug.Log($"{encryptedJsonData}\n{decyptedJsonData}");
 
 #if UNITY_EDITOR
             Debug.Log($"Loaded JSON at {path} \nEncrypted as: {encryptedJsonData}\nDecrypted to {typeof(T)}: {decyptedJsonData}");
@@ -113,7 +112,6 @@ public class Manager_Save
 
     private static string GetPath((string name, string format) saveData)
     {
-        UnityEngine.Debug.Log($"name: {saveData.name} |format: {saveData.format}");
         return $"{Application.persistentDataPath}{saveData.name}{saveData.format}";
     }
 
@@ -121,7 +119,12 @@ public class Manager_Save
     {
         if (data != null)
         {
+#if UNITY_EDITOR
+            return JsonUtility.ToJson(data, true);
+#else
             return JsonUtility.ToJson(data);
+#endif
+
         }
 #if UNITY_EDITOR
         else
