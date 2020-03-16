@@ -10,9 +10,9 @@ ___
 
 ### How to use:
 1. Go to the Manager_Save under `#region` SaveInfos.
-2. Create a `public static (string name, string format) variableName = ("savedFileName", "savedFileFormat");` 
+2. Create a `public static (string name, string format) saveInfo = ("savedFileName", "savedFileFormat");` 
 There is a template. You can use any name and any format.
-3. Now, anywhere, you can call ```Manager_Save.SaveData(variableName, yourData)``` and ```Manager_Save.LoadData<type>(variableName, yourData)```;
+3. Now, anywhere, you can call ```Manager_Save.SaveData(saveInfo, yourData)``` and ```Manager_Save.LoadData<type>(saveInfo, yourData)```.
 
 ___
 ### Notes  
