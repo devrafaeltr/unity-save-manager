@@ -37,7 +37,7 @@ When calling ```Manager_Save.LoadData<type>()```, does not forget to pass your v
   Manager_Save.LoadData<SomeClass>(saveInfo, playerDataVariabel)
   ```
   
-You need to create a `public static (string name, string format) variableName` in the `Manager_Save` for **EACH** different save file. For example, if you want to save PlayerData and GameConfigs separately.
+You need to create a `public static (string name, string format) saveInfo` in the `Manager_Save` for **EACH** different save file. For example, if you want to save PlayerData and GameConfigs separately.
 ___
 ## Know limitations
 Since Manager_Save uses JsonUtility it does not work for primitive type, yet. See more [here](https://docs.unity3d.com/ScriptReference/JsonUtility.ToJson.html).  
