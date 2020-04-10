@@ -1,5 +1,5 @@
 [![GitHub](https://img.shields.io/github/license/devrafael-source/Unity_SaveManager)](https://github.com/devrafael-source/Unity_SaveManager/blob/master/LICENSE)
-# SaveManager
+# unity-save-manager
 Simple way to save and load local data from your game.
 
 ___
