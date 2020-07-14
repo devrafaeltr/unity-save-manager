@@ -29,16 +29,16 @@ public class Manager_Save
 
             success = true;
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             Debug.Log($"Loaded JSON at {path} \nEncrypted as: {encryptedJsonData}\nDecrypted to {typeof(T)}: {decyptedJsonData}");
-#endif
+            #endif
         }
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         else
         {
             Debug.Log($"No file found. Returning new {typeof(T)}");
         }
-#endif
+        #endif
 
         resultCallback?.Invoke(success);
 
@@ -64,16 +64,16 @@ public class Manager_Save
 
             success = true;
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
             Debug.Log($"Saved {typeof(T)} at {path}\nas JSON: {decyptedJsonData}\nEncrypted to: {encryptedJsonData}");
-#endif
+        #endif
         }
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         else
         {
             Debug.LogError($"data param is null. Nothing to save.");
         }
-#endif
+        #endif
 
         resultCallback?.Invoke(success);
     }
@@ -84,18 +84,18 @@ public class Manager_Save
         string tempPath = GetPath(saveInfo);
         if (File.Exists(tempPath))
         {
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             Debug.Log($"Deleted {saveInfo.name}{saveInfo.format} at {Application.persistentDataPath}");
-#endif
+            #endif
             File.Delete(tempPath);
             success = true;
         }
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         else
         {
             Debug.Log($"No file named {saveInfo.name}{saveInfo.format} found at {Application.persistentDataPath}");
         }
-#endif
+        #endif
 
         resultCallback?.Invoke(success);
     }
@@ -109,20 +109,20 @@ public class Manager_Save
     {
         if (data != null)
         {
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             return JsonUtility.ToJson(data, true);
-#else
+            #else
             return JsonUtility.ToJson(data);
-#endif
+            #endif
 
         }
-#if UNITY_EDITOR
         else
         {
+            #if UNITY_EDITOR
             Debug.LogError($"data param is nul. Nothing to convert. Returning an empty string.");
+            #endif
             return "";
         }
-#endif
     }
 
     private static T FromJson<T>(string jsonData)
@@ -131,12 +131,12 @@ public class Manager_Save
         {
             return JsonUtility.FromJson<T>(jsonData);
         }
-#if UNITY_EDITOR
         else
         {
+            #if UNITY_EDITOR
             Debug.LogError($"jsonData param is empty. Nothing to convert. Returning a default value for {typeof(T)}.");
+            #endif
             return default;
         }
-#endif
     }
 }
