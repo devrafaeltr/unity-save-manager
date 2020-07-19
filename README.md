@@ -5,8 +5,8 @@ Simple way to save and load local data from your game.
 ___
 ## Getting started
 ### How to install:
-1. Download from [Releases](https://github.com/devrafael-source/unity-save-manager/files/4944506/devrafael_SaveManager.zip)
-2. Open your project, go to Assets > Import Package > Custom Package and choose the package OR double-click the package to import to the open project
+1. Download from [Releases](https://github.com/devrafael-source/unity-save-manager/files/4944506/devrafael_SaveManager.zip).
+2. Open your project, go to Assets > Import Package > Custom Package and choose the package OR double-click the package to import to the open project.
 
 ### How to use:
 1. Go to the Manager_Save under `#region SaveInfos`.
