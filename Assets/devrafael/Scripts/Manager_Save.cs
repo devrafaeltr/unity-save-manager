@@ -15,7 +15,6 @@ public class Manager_Save
         T dataToLoad = new T();
         bool success = false;
         string path = GetPath(saveInfo);
-        Debug.Log(path);
 
         if (File.Exists(path))
         {
