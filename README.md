@@ -14,6 +14,8 @@ ___
 There is a template. You can use any name and any format.
 3. Now, anywhere, you can call ```Manager_Save.SaveData(saveInfo, yourData)``` and ```Manager_Save.LoadData<type>(saveInfo, yourData)```.
 
+### Settings:
+You can change `SHOW_DEBUG` to `true` or `false` in the Manager_Save to choose wether or not to show debug logs.
 ___
 ### Notes  
 Always use `[System.Serializable]` in the class or struct that you are saving:
