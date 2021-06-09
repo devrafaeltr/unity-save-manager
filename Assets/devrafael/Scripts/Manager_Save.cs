@@ -8,7 +8,11 @@ public class Manager_Save
     //Template
     //public static readonly (string name, string format) anotherCool_SaveInfo = ("someName", ".someFormat");
     public static readonly (string name, string format) playerData_SaveInfo = ("myPlayerData", ".dat");
-    #endregion    
+    #endregion
+
+#if UNITY_EDITOR
+    private static bool SHOW_DEBUG = false;
+#endif
 
     public static T LoadData<T>((string name, string format) saveInfo, System.Action<bool> resultCallback = null) where T : new()
     {
@@ -28,11 +32,14 @@ public class Manager_Save
             success = true;
 
 #if UNITY_EDITOR
-            Debug.Log($"Loaded {typeof(T)} from {path}.");
+            if (SHOW_DEBUG)
+            {
+                Debug.Log($"Loaded {typeof(T)} from {path}.");
+            }
 #endif
         }
 #if UNITY_EDITOR
-        else
+        else if (SHOW_DEBUG)
         {
             Debug.Log($"No file found. Returning new {typeof(T)}");
         }
@@ -59,11 +66,14 @@ public class Manager_Save
             success = true;
 
 #if UNITY_EDITOR
-            Debug.Log($"Saved {typeof(T)} at {path}.");
+            if (SHOW_DEBUG)
+            {
+                Debug.Log($"Saved {typeof(T)} at {path}.");
+            }
 #endif
         }
 #if UNITY_EDITOR
-        else
+        else if (SHOW_DEBUG)
         {
             Debug.LogError($"data param is null. Nothing to save.");
         }
@@ -79,13 +89,16 @@ public class Manager_Save
         if (File.Exists(tempPath))
         {
 #if UNITY_EDITOR
-            Debug.Log($"Deleted {saveInfo.name}{saveInfo.format} at {Application.persistentDataPath}");
+            if (SHOW_DEBUG)
+            {
+                Debug.Log($"Deleted {saveInfo.name}{saveInfo.format} at {Application.persistentDataPath}");
+            }
 #endif
             File.Delete(tempPath);
             success = true;
         }
 #if UNITY_EDITOR
-        else
+        else if (SHOW_DEBUG)
         {
             Debug.Log($"No file named {saveInfo.name}{saveInfo.format} found at {Application.persistentDataPath}");
         }
