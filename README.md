@@ -40,6 +40,3 @@ When calling ```Manager_Save.LoadData<type>()```, does not forget to pass your v
   ```
   
 You need to create a `public static (string name, string format) saveInfo` in the `Manager_Save` for **EACH** different save file. For example, if you want to save PlayerData and GameConfigs separately.
-___
-## Known limitations
-Limited to [Unity's Serialization rules](https://docs.unity3d.com/Manual/script-Serialization.html).
